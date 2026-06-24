@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>NN Welcome</title>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <style>
+        body {
+            background-color: #1e1e2f;
+            font-family: Arial, sans-serif;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .welcome-box {
+            background-color: #2b2b3f;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 320px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+
+        .username {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4a90e2;
+            margin-bottom: 25px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #b0b0c0;
+            margin-bottom: 30px;
+        }
+
+        a.button {
+            display: block;
+            padding: 10px;
+            background-color: #4a90e2;
+            border-radius: 4px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a.button:hover {
+            background-color: #357abd;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="welcome-box">
+        <h1>Welcome back</h1>
+        <div class="username">{{ username }}</div>
+        <div class="subtitle">Neuron Network is ready</div>
+        <a href="/dashboard" class="button">Continue</a>
+    </div>
+</body>
+
+</html>

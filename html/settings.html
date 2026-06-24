@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Settings</title>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e2f;
+            color: #e0e0e0;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            background-color: #1e1e2f;
+            border-bottom: 1px solid #333;
+            z-index: 1000;
+        }
+
+        .header img {
+            height: 32px;
+            width: 32px;
+            margin-right: 15px;
+        }
+
+        .header a {
+            color: #e0e0e0;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+
+        .header .spacer {
+            flex: 1;
+        }
+
+        .settings-container {
+            margin-top: 80px;
+            padding: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .settings-container h1 {
+            color: #4a90e2;
+            margin-bottom: 20px;
+        }
+
+        .settings-container label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        .settings-container input,
+        .settings-container select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background: #2a2a3d;
+            color: #fff;
+        }
+
+        .settings-container button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+
+        .settings-container p {
+            margin-top: 20px;
+            padding: 12px 24px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+
+        .settings-container button:hover {
+            background: linear-gradient(135deg, #357abd, #1e60b2);
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: #fff;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #357abd, #1e60b2);
+        }
+    </style>
+    <header class="header">
+        <img src="/static/favicon.ico" alt="logo">
+        <a href="/dashboard">Dashboard</a>
+        <div class="spacer"></div>
+        <a href="/logout">
+            <img src="/static/logout.png" alt="Logout" title="Logout" style="height:24px; width:24px; cursor:pointer;">
+        </a>
+    </header>
+</head>
+
+<body>
+    <div class="settings-container">
+        <h1>Settings</h1>
+        <form method="POST">
+            {% for key, value in settings.items() %}
+            <label for="{{ key }}">{{ key }}</label>
+            {% if value is boolean %}
+            <select name="{{ key }}">
+                <option value="true" {% if value %}selected{% endif %}>True</option>
+                <option value="false" {% if not value %}selected{% endif %}>False</option>
+            </select>
+            {% elif value is number %}
+            <input type="number" name="{{ key }}" value="{{ value }}">
+            {% else %}
+            <input type="text" name="{{ key }}" value="{{ value }}">
+            {% endif %}
+            {% endfor %}
+            <a href="/settings/change_password" class="btn">Change Password</a>
+            <br>
+            <button type="submit">Save Settings</button>
+        </form>
+    </div>
+</body>
+
+</html>

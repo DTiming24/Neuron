@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>User Management</title>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e2f;
+            color: #e0e0e0;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            background-color: #1e1e2f;
+            border-bottom: 1px solid #333;
+        }
+
+        .header a {
+            color: #e0e0e0;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+
+        .spacer {
+            flex: 1;
+        }
+
+        .container {
+            margin-top: 90px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px;
+        }
+
+        h1,
+        h2 {
+            color: #4a90e2;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        th,
+        td {
+            border: 1px solid #444;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #2a2a3d;
+        }
+
+        input,
+        select {
+            width: 90%;
+            padding: 6px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background: #2a2a3d;
+            color: #fff;
+        }
+
+        button {
+            padding: 10px 20px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #357abd, #1e60b2);
+        }
+
+        .error {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <a href="/dashboard">Dashboard</a>
+        <div class="spacer"></div>
+        <a href="/logout">Logout</a>
+    </header>
+
+    <div class="container">
+        <h1>User Management</h1>
+
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <!-- EXISTING USERS -->
+        <form method="POST" action="/admin_tools/user_management/update">
+            <table>
+                <tr>
+                    <th>Username</th>
+                    <th>Active</th>
+                    <th>Private</th>
+                    <th>Role</th>
+                    <th>Password</th>
+                    <th>Delete</th>
+                </tr>
+
+                {% for username, user in users.items() %}
+                <tr>
+                    <td>{{ username }}</td>
+
+                    <td>
+                        <select name="active_{{ username }}">
+                            <option value="true" {% if user.active %}selected{% endif %}>True</option>
+                            <option value="false" {% if not user.active %}selected{% endif %}>False</option>
+                        </select>
+                    </td>
+
+                    <td>
+                        <select name="private_{{ username }}">
+                            <option value="true" {% if user.private %}selected{% endif %}>True</option>
+                            <option value="false" {% if not user.private %}selected{% endif %}>False</option>
+                        </select>
+                    </td>
+
+                    <td>{{ user.role }}</td>
+
+                    <td>
+                        <input type="password" name="password_{{ username }}" value="{{ user.password }}">
+                    </td>
+
+                    <td>
+                        <input type="checkbox" name="delete_{{ username }}">
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+
+            <button type="submit">Save Changes</button>
+        </form>
+
+        <!-- ADD USER -->
+        <h2>Add New User</h2>
+
+        <form method="POST" action="/admin_tools/user_management/add">
+            <label>Username</label>
+            <input type="text" name="new_username" required>
+
+            <label>Password</label>
+            <input type="password" name="new_password" required>
+
+            <label>Active</label>
+            <select name="new_active">
+                <option value="true">True</option>
+                <option value="false" selected>False</option>
+            </select>
+
+            <label>Private</label>
+            <select name="new_private">
+                <option value="true">True</option>
+                <option value="false" selected>False</option>
+            </select>
+
+            <br><br>
+            <button type="submit">Add User</button>
+        </form>
+    </div>
+
+</body>
+
+</html>

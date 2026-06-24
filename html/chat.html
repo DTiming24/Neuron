@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Neuron Chat</title>
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e2f;
+            color: #e0e0e0;
+        }
+
+        .message blockquote {
+            margin: 10px 0;
+            padding: 10px 15px;
+            border-left: 4px solid #4a90e2;
+            background-color: #2f2f44;
+            font-style: italic;
+            color: #cfcfcf;
+        }
+
+        .message pre {
+            background-color: #1e1e2f;
+            padding: 10px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: Consolas, "Courier New", monospace;
+            color: #dcdcdc;
+        }
+
+        .message code {
+            background-color: #33334d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: Consolas, "Courier New", monospace;
+            color: #ffcc66;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            background-color: #2b2b3f;
+            padding-top: 60px;
+            /* отступ равный высоте header */
+            box-sizing: border-box;
+        }
+
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .message {
+            padding: 12px 20px;
+            border-radius: 20px;
+            max-width: 70%;
+            word-wrap: break-word;
+            line-height: 1.4;
+            font-size: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+
+            white-space: pre-wrap;
+        }
+
+
+        .user-message {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background-color: #3a3a55;
+            color: #e0e0e0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .input-box {
+            display: flex;
+            padding: 10px 20px;
+            gap: 10px;
+            background-color: #1e1e2f;
+        }
+
+
+        .input-box textarea {
+            flex: 1;
+            padding: 12px 15px;
+            border-radius: 15px;
+            border: none;
+            outline: none;
+            background-color: #2b2b3f;
+            color: #fff;
+            font-size: 15px;
+            resize: none;
+            /* убирает возможность растягивать вручную */
+            height: 60px;
+            /* можно задать высоту */
+        }
+
+
+        .input-box button {
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: none;
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .input-box button:hover {
+            background: linear-gradient(135deg, #357abd, #1e60b2);
+        }
+
+        .dot {
+            animation: blink 1s infinite;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .header {
+            position: fixed;
+            /* всегда сверху */
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            background-color: #1e1e2f;
+            border-bottom: 1px solid #333;
+            z-index: 1000;
+        }
+
+        .header img {
+            height: 32px;
+            width: 32px;
+            margin-right: 15px;
+        }
+
+        .header a {
+            color: #e0e0e0;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+
+        .header .spacer {
+            flex: 1;
+        }
+
+
+        @keyframes blink {
+
+            0%,
+            80%,
+            100% {
+                opacity: 0;
+            }
+
+            40% {
+                opacity: 1;
+            }
+        }
+    </style>
+    <header class="header">
+        <img src="/static/favicon.ico" alt="logo">
+        <a href="/dashboard">Dashboard</a>
+        <div class="spacer"></div>
+        <a href="/logout">
+            <img src="/static/logout.png" alt="Logout" title="Logout" style="height:24px; width:24px; cursor:pointer;">
+        </a>
+    </header>
+
+</head>
+
+<body>
+
+
+    <div class="chat-container">
+        <div class="messages" id="messages"></div>
+        <div class="input-box">
+            <textarea id="user-input" placeholder="Type a message..." autocomplete="off"></textarea>
+            <button id="send-btn" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const input = document.getElementById('user-input');
+        const button = document.getElementById('send-btn');
+
+        input.addEventListener('keydown', e => {
+            if ((e.key === 'Enter' && (!e.ctrlKey || !e.shiftKey))) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        input.addEventListener('input', () => {
+            input.style.height = 'auto';                // сброс
+            input.style.height = input.scrollHeight + 'px'; // новая высота по содержимому
+        });
+
+        async function loadHistory() {
+            try {
+                const response = await fetch('/neuron/api/history');
+                const history = await response.json();
+                history.forEach(msg => {
+                    const type = msg.role === 'user' ? 'user' : 'bot';
+                    addMessage(msg.content, type);
+                });
+            } catch {
+                console.warn("Could not load chat history");
+            }
+        }
+
+        async function sendMessage() {
+            const msg = input.value.trim();
+            if (!msg) return;
+            addMessage(msg, 'user');
+            input.value = '';
+            input.style.height = '60px';
+            input.disabled = true;
+            button.disabled = true;
+
+            const typingDiv = addMessage('...', 'bot', true);
+
+            try {
+                const response = await fetch('/neuron/api/request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg })
+                });
+                const data = await response.json();
+                typingDiv.remove();
+                addMessage(data.response, 'bot');
+            } catch {
+                typingDiv.remove();
+                addMessage("Error: could not reach server", 'bot');
+            } finally {
+                input.disabled = false;
+                button.disabled = false;
+                input.focus();
+                console.log(data.response);
+
+            }
+        }
+
+        function addMessage(text, type, isTyping = false) {
+            const container = document.getElementById('messages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message ' + (type === 'user' ? 'user-message' : 'bot-message');
+            if (isTyping) {
+                msgDiv.innerHTML = '<span><span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span>';
+            } else {
+                msgDiv.innerHTML = text;
+                // подсветка синтаксиса для новых сообщений
+                msgDiv.querySelectorAll('pre code').forEach(block => {
+                    hljs.highlightElement(block);
+                });
+            }
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+            return msgDiv;
+        }
+
+        window.addEventListener('DOMContentLoaded', loadHistory);
+    </script>
+</body>
+
+</html>
